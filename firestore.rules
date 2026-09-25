@@ -1,0 +1,78 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Admin access strictly restricted to phinihasgandi@gmail.com
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email.lower() == 'phinihasgandi@gmail.com'
+      );
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    // Departments - public read, admin write
+    match /departments/{departmentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Doctors - public read, admin write
+    match /doctors/{doctorId} {
+      allow read: if true;
+      allow create, update: if isAuthenticated();
+      allow delete: if isAuthenticated();
+    }
+
+    // Appointments - owner or admin can read/create/update/delete
+    match /appointments/{appointmentId} {
+      allow read: if isAuthenticated() && (
+        resource.data.patientId == request.auth.uid || 
+        resource.data.doctorId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        resource.data.patientId == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isAuthenticated() && (
+        resource.data.patientId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+
+    // Reports - owner or admin can read/write/delete
+    match /reports/{reportId} {
+      allow read: if isAuthenticated() && (
+        resource.data.patientId == request.auth.uid || 
+        isAdmin()
+      );
+      allow create: if isAuthenticated() && (
+        request.resource.data.patientId == request.auth.uid ||
+        isAdmin()
+      );
+      allow update: if isAuthenticated() && (
+        resource.data.patientId == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isAuthenticated() && (
+        resource.data.patientId == request.auth.uid ||
+        isAdmin()
+      );
+    }
+  }
+}

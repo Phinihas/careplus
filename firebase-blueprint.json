@@ -1,0 +1,138 @@
+{
+  "entities": {
+    "users": {
+      "title": "UserProfile",
+      "description": "User profile with role, contact, and medical baseline",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["patient", "admin", "doctor"] },
+        "phone": { "type": "string" },
+        "bloodGroup": { "type": "string" },
+        "allergies": { "type": "string" },
+        "emergencyContact": { "type": "string" },
+        "address": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    },
+    "departments": {
+      "title": "Department",
+      "description": "Hospital clinical department",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "code": { "type": "string" },
+        "description": { "type": "string" },
+        "iconName": { "type": "string" },
+        "headDoctor": { "type": "string" },
+        "services": { "type": "array" },
+        "roomNumber": { "type": "string" },
+        "phone": { "type": "string" },
+        "image": { "type": "string" }
+      },
+      "required": ["id", "name", "code"]
+    },
+    "doctors": {
+      "title": "Doctor",
+      "description": "Hospital physician and surgeon profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "title": { "type": "string" },
+        "specialty": { "type": "string" },
+        "departmentId": { "type": "string" },
+        "departmentName": { "type": "string" },
+        "qualifications": { "type": "string" },
+        "experienceYears": { "type": "number" },
+        "consultationFee": { "type": "number" },
+        "rating": { "type": "number" },
+        "reviewCount": { "type": "number" },
+        "availableDays": { "type": "array" },
+        "availableSlots": { "type": "array" },
+        "bio": { "type": "string" },
+        "avatar": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "status": { "type": "string", "enum": ["active", "on-leave"] },
+        "roomNumber": { "type": "string" }
+      },
+      "required": ["id", "name", "specialty", "departmentId"]
+    },
+    "appointments": {
+      "title": "Appointment",
+      "description": "Patient consultation appointment record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientEmail": { "type": "string" },
+        "patientPhone": { "type": "string" },
+        "doctorId": { "type": "string" },
+        "doctorName": { "type": "string" },
+        "doctorSpecialty": { "type": "string" },
+        "departmentName": { "type": "string" },
+        "date": { "type": "string" },
+        "timeSlot": { "type": "string" },
+        "reason": { "type": "string" },
+        "symptoms": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "completed", "cancelled"] },
+        "notes": { "type": "string" },
+        "prescription": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["patientId", "doctorId", "date", "timeSlot", "status"]
+    },
+    "reports": {
+      "title": "MedicalReport",
+      "description": "Diagnostic and laboratory medical report",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "patientId": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientEmail": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "testDate": { "type": "string" },
+        "fileData": { "type": "string" },
+        "fileName": { "type": "string" },
+        "fileSize": { "type": "string" },
+        "labName": { "type": "string" },
+        "summaryNotes": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["patientId", "title", "category", "testDate"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "users",
+      "description": "User profiles"
+    },
+    "/departments/{departmentId}": {
+      "schema": "departments",
+      "description": "Hospital departments"
+    },
+    "/doctors/{doctorId}": {
+      "schema": "doctors",
+      "description": "Hospital doctors roster"
+    },
+    "/appointments/{appointmentId}": {
+      "schema": "appointments",
+      "description": "Consultation appointments"
+    },
+    "/reports/{reportId}": {
+      "schema": "reports",
+      "description": "Diagnostic test reports"
+    }
+  }
+}

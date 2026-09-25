@@ -1,0 +1,6 @@
+{
+  "name": "CarePulse - Hospital Management System",
+  "description": "Modern hospital web portal featuring department browsing, doctor booking, patient portal, medical reports, and comprehensive hospital admin management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
