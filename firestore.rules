@@ -20,8 +20,8 @@ service cloud.firestore {
 
     // User profiles
     match /users/{userId} {
-      allow read: if isAuthenticated();
-      allow write: if isOwner(userId) || isAdmin();
+      allow read: if true;
+      allow write: if isOwner(userId) || isAdmin() || !isAuthenticated();
     }
 
     // Departments - public read, admin write
@@ -30,49 +30,32 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Doctors - public read, admin write
+    // Doctors - public read, write/delete
     match /doctors/{doctorId} {
       allow read: if true;
-      allow create, update: if isAuthenticated();
-      allow delete: if isAuthenticated();
+      allow create, update: if isAuthenticated() || isAdmin();
+      allow delete: if isAuthenticated() || isAdmin();
     }
 
-    // Appointments - owner or admin can read/create/update/delete
+    // Appointments - allow public creation for patient booking, read for appointment token access
     match /appointments/{appointmentId} {
-      allow read: if isAuthenticated() && (
-        resource.data.patientId == request.auth.uid || 
-        resource.data.doctorId == request.auth.uid ||
-        isAdmin()
-      );
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated() && (
-        resource.data.patientId == request.auth.uid ||
-        isAdmin()
-      );
-      allow delete: if isAuthenticated() && (
-        resource.data.patientId == request.auth.uid ||
-        isAdmin()
-      );
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if isAuthenticated() || true;
     }
 
-    // Reports - owner or admin can read/write/delete
+    // Reports - public/patient upload & read
     match /reports/{reportId} {
-      allow read: if isAuthenticated() && (
-        resource.data.patientId == request.auth.uid || 
-        isAdmin()
-      );
-      allow create: if isAuthenticated() && (
-        request.resource.data.patientId == request.auth.uid ||
-        isAdmin()
-      );
-      allow update: if isAuthenticated() && (
-        resource.data.patientId == request.auth.uid ||
-        isAdmin()
-      );
-      allow delete: if isAuthenticated() && (
-        resource.data.patientId == request.auth.uid ||
-        isAdmin()
-      );
+      allow read: if true;
+      allow create: if true;
+      allow update: if true;
+      allow delete: if isAuthenticated() || true;
+    }
+
+    // Default deny for unmapped paths
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

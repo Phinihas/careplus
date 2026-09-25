@@ -12,9 +12,12 @@ import {
   ChevronDown,
   Activity,
   MapPin,
-  Lock
+  Lock,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useAuth, AUTHORIZED_ADMIN_EMAIL } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useToast } from './Toast';
 
 interface NavbarProps {
@@ -32,58 +35,65 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuth,
   onOpenEmergency
 }) => {
-  const { user, profile, isAdmin, logout } = useAuth();
+  const { user, profile, isAdmin, role, overrideRole, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const { showToast } = useToast();
-  
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-  const handleLogout = async () => {
-    await logout();
-    setUserDropdownOpen(false);
-    showToast('Signed Out', 'You have been safely signed out from CarePulse Hospital portal.');
-    if (currentView === 'dashboard' || currentView === 'admin') {
-      setCurrentView('home');
+  // Check if current user is the authorized admin email
+  const isAuthorizedAdmin = user?.email?.toLowerCase() === AUTHORIZED_ADMIN_EMAIL.toLowerCase();
+
+  const handleRoleToggle = (targetRole: 'patient' | 'admin') => {
+    if (targetRole === 'admin' && !isAuthorizedAdmin) {
+      showToast('Access Restricted', `Admin access is restricted to ${AUTHORIZED_ADMIN_EMAIL}.`, 'error');
+      return;
     }
+    overrideRole(targetRole);
+    if (targetRole === 'admin') {
+      setCurrentView('admin');
+      showToast('Admin Mode Active', 'Hospital management console ready.');
+    } else {
+      setCurrentView('dashboard');
+      showToast('Patient Mode Active', 'Switched to Patient Portal.');
+    }
+    setIsProfileDropdownOpen(false);
   };
 
   const navLinks = [
     { id: 'home', label: 'Home' },
     { id: 'departments', label: 'Departments' },
-    { id: 'doctors', label: 'Doctors & Specialists' }
+    { id: 'doctors', label: 'Specialists' },
+    { id: 'dashboard', label: 'Patient Portal' },
   ];
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-emerald-100 shadow-xs">
+    <header className="sticky top-0 z-40 bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
       
-      {/* Indian Healthcare Micro-bar with Tricolor subtle accent */}
-      <div className="h-1 w-full bg-gradient-to-r from-amber-500 via-white to-emerald-600"></div>
-
-      <div className="bg-emerald-950 text-emerald-100 px-4 py-1.5 text-[11px] font-medium hidden sm:flex items-center justify-between">
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+      {/* Top Hotline & Indian Accreditations Bar */}
+      <div className="bg-gradient-to-r from-emerald-950 via-teal-950 to-emerald-900 text-white text-[11px] py-1.5 px-4 font-medium">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5 text-amber-300 font-semibold">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-              NABH & NABL Accredited Multi-Speciality Hospital
+            <span className="hidden sm:inline-flex items-center gap-1.5 text-amber-300 font-semibold">
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping inline-block" />
+              NABH & NABL Accredited | AB-PMJAY Empanelled
             </span>
-            <span className="text-emerald-400/40">|</span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3 text-emerald-400" />
-              OPD Timings: Mon – Sat 08:30 AM – 08:30 PM IST
+            <span className="flex items-center gap-1 text-emerald-200">
+              <Clock className="w-3 h-3 text-amber-300" />
+              <span>OPD: 08:30 AM – 08:00 PM (Mon-Sat)</span>
             </span>
           </div>
 
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1">
-              <PhoneCall className="w-3 h-3 text-rose-400" />
-              National Emergency Ambulance: <strong className="text-white font-mono ml-0.5">108 / 1066</strong>
-            </span>
+          <div className="flex items-center gap-3">
             <button
               onClick={onOpenEmergency}
-              className="text-amber-300 hover:text-amber-200 font-bold transition-colors underline"
+              className="flex items-center gap-1.5 text-rose-300 hover:text-rose-100 font-bold transition-colors cursor-pointer"
             >
-              24/7 Trauma Bay
+              <PhoneCall className="w-3 h-3 animate-pulse text-rose-400" />
+              <span>Emergency: 108 / 1066</span>
             </button>
+            <span className="text-emerald-700 hidden sm:inline">|</span>
+            <span className="hidden sm:inline text-slate-300 font-serif italic">सर्वे सन्तु निरामयाः</span>
           </div>
         </div>
       </div>
@@ -92,153 +102,181 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-18">
           
-          {/* Brand Logo with Indian Green Medical styling */}
+          {/* Brand Logo with Indian Saffron & Emerald touch */}
           <div 
-            onClick={() => setCurrentView('home')}
-            className="flex items-center gap-3 cursor-pointer group select-none"
+            onClick={() => setCurrentView('home')} 
+            className="flex items-center gap-3 cursor-pointer group"
           >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-800 via-emerald-700 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-900/20 group-hover:scale-105 transition-transform border border-emerald-500/30">
-              <HeartPulse className="w-6 h-6 text-white" />
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 via-emerald-600 to-teal-800 flex items-center justify-center text-slate-950 shadow-md group-hover:scale-105 transition-transform duration-300">
+              <HeartPulse className="w-6 h-6 text-slate-950" />
             </div>
             <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xl font-extrabold tracking-tight text-slate-900 group-hover:text-emerald-800 transition-colors">
-                  Care<span className="text-emerald-700">Pulse</span>
-                </span>
-                <span className="px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 text-[10px] font-bold border border-amber-300/60">
-                  INDIA
-                </span>
-              </div>
-              <p className="text-[10px] font-medium text-slate-500 -mt-0.5">Multi-Speciality Healthcare & Research</p>
+              <span className="text-xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
+                Care<span className="text-emerald-700 dark:text-emerald-400">Pulse</span>
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400 ml-0.5">HOSPITAL</span>
+              </span>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium -mt-1 hidden sm:block">
+                Super Speciality & Research Institute
+              </p>
             </div>
           </div>
 
-          {/* Desktop Nav Items */}
+          {/* Desktop Nav Links */}
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <button
                 key={link.id}
                 onClick={() => setCurrentView(link.id as any)}
-                className={`py-2 px-3.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`py-2 px-3.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer ${
                   currentView === link.id
-                    ? 'bg-emerald-50 text-emerald-800 font-bold border border-emerald-200/80'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 shadow-xs'
+                    : 'text-slate-600 dark:text-slate-300 hover:text-emerald-800 dark:hover:text-emerald-300 hover:bg-slate-50 dark:hover:bg-slate-900'
                 }`}
               >
                 {link.label}
               </button>
             ))}
 
-            {user && (
-              <button
-                onClick={() => setCurrentView('dashboard')}
-                className={`py-2 px-3.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
-                  currentView === 'dashboard'
-                    ? 'bg-emerald-50 text-emerald-800 font-bold border border-emerald-200/80'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <Activity className="w-3.5 h-3.5 text-emerald-600" />
-                <span>Patient Portal</span>
-              </button>
-            )}
-
-            {/* Admin Console strictly visible to phinihasgandi@gmail.com */}
-            {isAdmin && (
+            {/* Admin Console link ONLY visible for phinihasgandi@gmail.com */}
+            {isAuthorizedAdmin && (
               <button
                 onClick={() => setCurrentView('admin')}
-                className={`py-2 px-3.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                className={`py-2 px-3.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center gap-1.5 ${
                   currentView === 'admin'
-                    ? 'bg-slate-900 text-white font-bold shadow-xs'
-                    : 'text-emerald-900 bg-emerald-50/60 hover:bg-emerald-100/60 border border-emerald-200'
+                    ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 shadow-xs'
+                    : 'text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40'
                 }`}
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-teal-600" />
+                <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                 <span>Admin Console</span>
               </button>
             )}
           </nav>
 
-          {/* Action Buttons & Profile */}
+          {/* Right Action Cluster: Theme Toggle, Booking CTA, User Auth */}
           <div className="hidden md:flex items-center gap-3">
+            
+            {/* Dark Mode Toggle Button */}
             <button
-              onClick={onOpenBooking}
-              className="py-2.5 px-4 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition-all shadow-md shadow-emerald-800/20 flex items-center gap-1.5 active:scale-95 border border-emerald-600"
+              onClick={toggleTheme}
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-amber-300 transition-all duration-300 cursor-pointer shadow-xs active:scale-95"
+              title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label="Toggle Dark Mode"
             >
-              <Calendar className="w-4 h-4 text-emerald-200" />
-              <span>Book Appointment</span>
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 animate-in spin-in-90 duration-300 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 animate-in spin-in-90 duration-300 text-slate-700" />
+              )}
             </button>
 
+            {/* Quick Book Appointment CTA */}
+            <button
+              onClick={onOpenBooking}
+              className="py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-400 to-emerald-400 hover:from-amber-300 hover:to-emerald-300 text-slate-950 font-extrabold text-xs shadow-md transition-all flex items-center gap-1.5 active:scale-95 cursor-pointer"
+            >
+              <Calendar className="w-3.5 h-3.5 text-slate-950" />
+              <span>Book Appointment (₹)</span>
+            </button>
+
+            {/* User Profile / Login */}
             {user ? (
-              /* User Profile Menu */
               <div className="relative">
                 <button
-                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2 p-1.5 rounded-xl border border-slate-200 hover:border-emerald-400 transition-colors bg-white"
+                  onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                  className="flex items-center gap-2 p-1.5 pr-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
                 >
-                  <img
-                    src={profile?.photoURL || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.email || 'User')}`}
-                    alt="User Avatar"
-                    className="w-7 h-7 rounded-lg object-cover bg-emerald-50"
-                  />
-                  <div className="text-left">
-                    <span className="text-xs font-bold text-slate-800 block max-w-[110px] truncate leading-tight">
-                      {profile?.displayName || user.displayName || 'Account'}
-                    </span>
-                    <span className="text-[10px] text-emerald-700 font-medium block">
-                      {isAdmin ? 'Chief Admin' : 'Patient'}
-                    </span>
+                  <div className="w-8 h-8 rounded-lg bg-emerald-800 text-white font-bold flex items-center justify-center text-xs">
+                    {(profile?.displayName || user.displayName || user.email || 'U')[0].toUpperCase()}
+                  </div>
+                  <div className="text-left hidden lg:block">
+                    <p className="text-xs font-bold text-slate-900 dark:text-white line-clamp-1">
+                      {profile?.displayName || user.displayName || 'Patient'}
+                    </p>
+                    <p className="text-[10px] text-emerald-800 dark:text-emerald-400 capitalize">
+                      {isAuthorizedAdmin && role === 'admin' ? 'Admin' : 'Patient'}
+                    </p>
                   </div>
                   <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
                 </button>
 
-                {userDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 text-xs animate-in fade-in">
-                    <div className="px-4 py-2.5 border-b border-slate-100 bg-slate-50/50">
-                      <p className="font-bold text-slate-900 truncate">{profile?.displayName || user.displayName || 'Patient'}</p>
-                      <p className="text-[11px] text-slate-500 truncate">{user.email}</p>
-                      <span className={`inline-block mt-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                        isAdmin ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-emerald-100 text-emerald-800'
-                      }`}>
-                        {isAdmin ? 'Chief Hospital Administrator' : 'Verified Patient'}
-                      </span>
+                {/* Dropdown Menu */}
+                {isProfileDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 text-xs text-slate-700 dark:text-slate-200 z-50 animate-in fade-in zoom-in-95">
+                    <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800">
+                      <p className="font-bold text-slate-900 dark:text-white truncate">
+                        {profile?.displayName || user.displayName || 'Signed In'}
+                      </p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
                     </div>
 
-                    <button
-                      onClick={() => {
-                        setCurrentView('dashboard');
-                        setUserDropdownOpen(false);
-                      }}
-                      className="w-full text-left px-4 py-2 hover:bg-emerald-50 text-slate-700 flex items-center gap-2"
-                    >
-                      <Activity className="w-4 h-4 text-emerald-600" />
-                      <span>Patient Dashboard & Lab Reports</span>
-                    </button>
-
-                    {isAdmin ? (
+                    <div className="py-1">
                       <button
                         onClick={() => {
-                          setCurrentView('admin');
-                          setUserDropdownOpen(false);
+                          setCurrentView('dashboard');
+                          setIsProfileDropdownOpen(false);
                         }}
-                        className="w-full text-left px-4 py-2 hover:bg-slate-100 text-slate-900 font-semibold flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 hover:bg-emerald-50 dark:hover:bg-slate-800 flex items-center gap-2 text-slate-700 dark:text-slate-200"
                       >
-                        <ShieldCheck className="w-4 h-4 text-teal-700" />
-                        <span>Hospital Admin Console</span>
+                        <User className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
+                        <span>Patient Portal & Reports</span>
                       </button>
-                    ) : (
-                      <div className="px-4 py-1.5 text-[11px] text-slate-400 italic flex items-center gap-1.5">
-                        <Lock className="w-3 h-3 text-slate-400 shrink-0" />
-                        <span>Admin console restricted to {AUTHORIZED_ADMIN_EMAIL}</span>
+
+                      {isAuthorizedAdmin && (
+                        <button
+                          onClick={() => {
+                            setCurrentView('admin');
+                            setIsProfileDropdownOpen(false);
+                          }}
+                          className="w-full text-left px-4 py-2 hover:bg-amber-50 dark:hover:bg-slate-800 flex items-center gap-2 text-amber-900 dark:text-amber-300 font-semibold"
+                        >
+                          <ShieldCheck className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                          <span>Admin Console</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Role Switcher for Admin account */}
+                    {isAuthorizedAdmin && (
+                      <div className="px-3 py-2 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+                        <span className="text-[10px] text-slate-400 uppercase font-bold block mb-1">
+                          Role Switcher
+                        </span>
+                        <div className="grid grid-cols-2 gap-1">
+                          <button
+                            onClick={() => handleRoleToggle('patient')}
+                            className={`py-1 px-2 rounded-lg text-center font-bold text-[11px] ${
+                              role === 'patient'
+                                ? 'bg-emerald-800 text-white'
+                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                            }`}
+                          >
+                            Patient
+                          </button>
+                          <button
+                            onClick={() => handleRoleToggle('admin')}
+                            className={`py-1 px-2 rounded-lg text-center font-bold text-[11px] ${
+                              role === 'admin'
+                                ? 'bg-amber-500 text-slate-950'
+                                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300'
+                            }`}
+                          >
+                            Admin
+                          </button>
+                        </div>
                       </div>
                     )}
 
-                    <div className="border-t border-slate-100 mt-1 pt-1">
+                    <div className="pt-1 border-t border-slate-100 dark:border-slate-800">
                       <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-rose-600 hover:bg-rose-50 flex items-center gap-2 font-medium"
+                        onClick={async () => {
+                          setIsProfileDropdownOpen(false);
+                          await logout();
+                          showToast('Signed Out', 'You have been safely signed out.');
+                        }}
+                        className="w-full text-left px-4 py-2 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 flex items-center gap-2 font-medium"
                       >
-                        <LogOut className="w-4 h-4" />
+                        <LogOut className="w-3.5 h-3.5" />
                         <span>Sign Out</span>
                       </button>
                     </div>
@@ -248,100 +286,100 @@ export const Navbar: React.FC<NavbarProps> = ({
             ) : (
               <button
                 onClick={() => onOpenAuth()}
-                className="py-2.5 px-4 rounded-xl border border-slate-200 hover:border-emerald-600 text-slate-700 hover:text-emerald-700 font-semibold text-xs transition-colors flex items-center gap-1.5"
+                className="py-2.5 px-4 rounded-xl border border-emerald-700 dark:border-emerald-500 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 font-bold text-xs transition-colors cursor-pointer"
               >
-                <User className="w-4 h-4" />
-                <span>Sign In / Register</span>
+                Sign In / Register
               </button>
             )}
+
           </div>
 
-          {/* Mobile menu trigger */}
+          {/* Mobile Right Controls: Dark toggle + Menu Trigger */}
           <div className="flex md:hidden items-center gap-2">
             <button
-              onClick={onOpenBooking}
-              className="py-1.5 px-3 rounded-xl bg-emerald-700 text-white font-semibold text-xs"
+              onClick={toggleTheme}
+              className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-300 cursor-pointer"
+              title="Toggle theme"
             >
-              Book
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
             </button>
+
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-xl text-slate-700 hover:bg-slate-100"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6 text-slate-900 dark:text-white" />}
             </button>
           </div>
 
         </div>
       </div>
 
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200 bg-white px-4 py-4 space-y-3 animate-in slide-in-from-top-3">
-          <div className="flex flex-col gap-1">
+      {/* Mobile Drawer Navigation */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top-4">
+          <div className="grid grid-cols-2 gap-2">
             {navLinks.map((link) => (
               <button
                 key={link.id}
                 onClick={() => {
                   setCurrentView(link.id as any);
-                  setMobileMenuOpen(false);
+                  setIsMobileMenuOpen(false);
                 }}
-                className={`py-2 px-3 rounded-xl text-left text-sm font-semibold ${
+                className={`py-2 px-3 rounded-xl font-bold text-xs text-left ${
                   currentView === link.id
-                    ? 'bg-emerald-50 text-emerald-800'
-                    : 'text-slate-700 hover:bg-slate-50'
+                    ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300'
+                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900'
                 }`}
               >
                 {link.label}
               </button>
             ))}
-
-            {user && (
-              <button
-                onClick={() => {
-                  setCurrentView('dashboard');
-                  setMobileMenuOpen(false);
-                }}
-                className="py-2 px-3 rounded-xl text-left text-sm font-semibold text-emerald-700 bg-emerald-50/50 flex items-center gap-2"
-              >
-                <Activity className="w-4 h-4" />
-                <span>My Patient Dashboard</span>
-              </button>
-            )}
-
-            {isAdmin && (
-              <button
-                onClick={() => {
-                  setCurrentView('admin');
-                  setMobileMenuOpen(false);
-                }}
-                className="py-2 px-3 rounded-xl text-left text-sm font-semibold text-slate-900 bg-slate-100 flex items-center gap-2"
-              >
-                <ShieldCheck className="w-4 h-4 text-teal-700" />
-                <span>Admin Console</span>
-              </button>
-            )}
           </div>
 
-          <div className="pt-3 border-t border-slate-100 space-y-2">
+          {isAuthorizedAdmin && (
+            <button
+              onClick={() => {
+                setCurrentView('admin');
+                setIsMobileMenuOpen(false);
+              }}
+              className="w-full py-2.5 px-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5"
+            >
+              <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span>Admin Console ({AUTHORIZED_ADMIN_EMAIL})</span>
+            </button>
+          )}
+
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-2">
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                onOpenBooking();
+              }}
+              className="w-full py-2.5 rounded-xl bg-emerald-800 text-white font-bold text-xs flex items-center justify-center gap-1.5"
+            >
+              <Calendar className="w-4 h-4" />
+              <span>Book OPD Appointment (₹)</span>
+            </button>
+
             {user ? (
               <button
-                onClick={() => {
-                  handleLogout();
-                  setMobileMenuOpen(false);
+                onClick={async () => {
+                  setIsMobileMenuOpen(false);
+                  await logout();
+                  showToast('Signed Out', 'You have been safely signed out.');
                 }}
-                className="w-full py-2 px-3 text-rose-600 text-left text-sm font-semibold flex items-center gap-2"
+                className="w-full py-2 rounded-xl border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 font-semibold text-xs text-center"
               >
-                <LogOut className="w-4 h-4" />
-                <span>Sign Out ({user.email})</span>
+                Sign Out ({user.displayName || user.email})
               </button>
             ) : (
               <button
                 onClick={() => {
+                  setIsMobileMenuOpen(false);
                   onOpenAuth();
-                  setMobileMenuOpen(false);
                 }}
-                className="w-full py-2.5 px-4 bg-emerald-700 text-white rounded-xl text-center text-sm font-semibold shadow-xs"
+                className="w-full py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs text-center"
               >
                 Sign In / Register
               </button>

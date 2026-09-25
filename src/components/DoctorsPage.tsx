@@ -49,33 +49,33 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-in fade-in">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-in fade-in transition-colors duration-300">
       
       {/* Page Header */}
       <div className="text-center max-w-3xl mx-auto mb-10">
-        <span className="px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-900 text-xs font-bold uppercase tracking-wider border border-emerald-200">
+        <span className="px-3.5 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-300 text-xs font-bold uppercase tracking-wider border border-emerald-200 dark:border-emerald-800">
           Premier Indian Medical Faculty
         </span>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mt-2 mb-3">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight mt-2 mb-3">
           Meet Our Specialists & Surgeons
         </h1>
-        <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
-          Distinguished medical professors and surgeons from AIIMS, PGI, CMC Vellore, and international fellowships, offering outpatient consultations and advanced inpatient care with transparent OPD fees.
+        <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+          Distinguished medical professors and surgeons from AIIMS, PGI, CMC Vellore, and international fellowships, offering outpatient consultations with transparent OPD fees.
         </p>
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-xs mb-8 space-y-4">
+      <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-xs mb-8 space-y-4 transition-colors">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {/* Search Input */}
           <div className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
             <input
               type="text"
-              placeholder="Search by doctor name, specialty, or AIIMS/PGI credentials..."
+              placeholder="Search by doctor name, specialty, or credentials..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-500/20"
+              className="w-full pl-10 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:border-emerald-700 focus:ring-2 focus:ring-emerald-500/20"
             />
           </div>
 
@@ -84,7 +84,7 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
             <select
               value={selectedDeptId}
               onChange={(e) => setSelectedDeptId(e.target.value)}
-              className="w-full py-2 px-3 text-xs rounded-xl border border-slate-200 bg-white font-medium text-slate-700 focus:outline-none focus:border-emerald-700"
+              className="w-full py-2 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-emerald-700"
             >
               <option value="all">All Specialties & Departments</option>
               {departments.map((d) => (
@@ -98,7 +98,7 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
             <select
               value={selectedDay}
               onChange={(e) => setSelectedDay(e.target.value)}
-              className="w-full py-2 px-3 text-xs rounded-xl border border-slate-200 bg-white font-medium text-slate-700 focus:outline-none focus:border-emerald-700"
+              className="w-full py-2 px-3 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 font-medium text-slate-700 dark:text-slate-200 focus:outline-none focus:border-emerald-700"
             >
               <option value="all">Any Day of the Week</option>
               {daysOfWeek.map((day) => (
@@ -118,7 +118,7 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
             className={`py-1 px-3 rounded-lg font-semibold shrink-0 transition-colors cursor-pointer ${
               selectedDeptId === 'all'
                 ? 'bg-emerald-800 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
             }`}
           >
             All ({doctors.length})
@@ -130,7 +130,7 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
               className={`py-1 px-3 rounded-lg font-semibold shrink-0 transition-colors cursor-pointer ${
                 selectedDeptId === dept.id
                   ? 'bg-emerald-800 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               {dept.name.split('&')[0].trim()}
@@ -141,10 +141,10 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
 
       {/* Doctors Grid */}
       {filteredDoctors.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800">
           <Stethoscope className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-lg font-bold text-slate-800">No Specialists Match Filter Criteria</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto mt-1 mb-4">
+          <h3 className="text-lg font-bold text-slate-800 dark:text-white">No Specialists Match Filter Criteria</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mt-1 mb-4">
             Try adjusting your search keywords, department selection, or availability day.
           </p>
           <button
@@ -159,11 +159,11 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
           {filteredDoctors.map((doc) => (
             <div
               key={doc.id}
-              className="bg-white rounded-3xl border border-slate-200/90 hover:border-emerald-400 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group"
+              className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 hover:border-emerald-400 dark:hover:border-emerald-500 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col justify-between group"
             >
               <div>
                 {/* Doctor Avatar Header */}
-                <div className="relative h-48 bg-slate-100 overflow-hidden">
+                <div className="relative h-48 bg-slate-100 dark:bg-slate-800 overflow-hidden">
                   <img
                     src={doc.avatar}
                     alt={doc.name}
@@ -172,8 +172,8 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
 
                   {/* INR Fee badge */}
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-xl bg-white/95 text-slate-900 text-xs font-bold shadow-xs backdrop-blur-xs flex items-center gap-0.5">
-                    <span className="text-[10px] text-slate-400 font-normal">OPD Fee</span>
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-xl bg-white/95 dark:bg-slate-900/95 text-slate-900 dark:text-white text-xs font-bold shadow-xs backdrop-blur-xs flex items-center gap-0.5">
+                    <span className="text-[10px] text-slate-400 font-normal">OPD</span>
                     <span>₹{doc.consultationFee}</span>
                   </div>
 
@@ -189,27 +189,27 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
 
                 {/* Details */}
                 <div className="p-5">
-                  <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-100 inline-block mb-1">
+                  <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold border border-emerald-100 dark:border-emerald-800 inline-block mb-1">
                     {doc.specialty}
                   </span>
 
-                  <h3 className="text-base font-bold text-slate-900 group-hover:text-emerald-800 transition-colors">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-800 dark:group-hover:text-emerald-400 transition-colors">
                     {doc.name}
                   </h3>
-                  <p className="text-xs text-slate-500 line-clamp-1">{doc.title}</p>
-                  <p className="text-[11px] text-emerald-700 font-semibold mt-0.5">{doc.qualifications}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">{doc.title}</p>
+                  <p className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold mt-0.5">{doc.qualifications}</p>
 
-                  <div className="mt-3 pt-3 border-t border-slate-100 space-y-1.5 text-[11px] text-slate-600">
+                  <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 space-y-1.5 text-[11px] text-slate-600 dark:text-slate-400">
                     <div className="flex items-center gap-1.5">
-                      <Award className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                      <Award className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
                       <span><strong>{doc.experienceYears} Years</strong> Clinical Practice</span>
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                      <MapPin className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400 shrink-0" />
                       <span>{doc.roomNumber || 'OPD Suite'}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-slate-500">
-                      <Clock className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                    <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+                      <Clock className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400 shrink-0" />
                       <span className="truncate">{doc.availableDays.slice(0, 3).join(', ')}...</span>
                     </div>
                   </div>
@@ -217,10 +217,10 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-2">
+              <div className="p-4 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                 <button
                   onClick={() => setSelectedDoctorModal(doc)}
-                  className="py-2 px-2.5 text-xs font-semibold text-slate-600 hover:text-emerald-800 transition-colors cursor-pointer"
+                  className="py-2 px-2.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-emerald-800 dark:hover:text-emerald-400 transition-colors cursor-pointer"
                 >
                   View Profile
                 </button>
@@ -239,8 +239,8 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
 
       {/* DOCTOR PROFILE MODAL */}
       {selectedDoctorModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-in fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden text-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-700 max-w-lg w-full overflow-hidden text-slate-800 dark:text-slate-100 transition-colors">
             <div className="relative h-44 bg-slate-900">
               <img
                 src={selectedDoctorModal.avatar}
@@ -263,46 +263,46 @@ export const DoctorsPage: React.FC<DoctorsPageProps> = ({
               </div>
             </div>
 
-            <div className="p-6 space-y-4 text-xs text-slate-600 max-h-[60vh] overflow-y-auto">
+            <div className="p-6 space-y-4 text-xs text-slate-600 dark:text-slate-300 max-h-[60vh] overflow-y-auto">
               <div>
-                <strong className="block text-slate-900 text-xs mb-1">Medical Credentials & Background</strong>
-                <p className="font-semibold text-emerald-900">{selectedDoctorModal.qualifications}</p>
-                <p className="text-slate-500">{selectedDoctorModal.experienceYears} Years Clinical & Academic Experience</p>
-                <p className="text-emerald-800 font-medium mt-0.5">{selectedDoctorModal.departmentName}</p>
+                <strong className="block text-slate-900 dark:text-white text-xs mb-1">Medical Credentials & Background</strong>
+                <p className="font-semibold text-emerald-900 dark:text-emerald-300">{selectedDoctorModal.qualifications}</p>
+                <p className="text-slate-500 dark:text-slate-400">{selectedDoctorModal.experienceYears} Years Clinical Experience</p>
+                <p className="text-emerald-800 dark:text-emerald-400 font-medium mt-0.5">{selectedDoctorModal.departmentName}</p>
               </div>
 
               <div>
-                <strong className="block text-slate-900 text-xs mb-1">Clinical Bio & Treatment Approach</strong>
-                <p className="leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                <strong className="block text-slate-900 dark:text-white text-xs mb-1">Clinical Bio & Treatment Approach</strong>
+                <p className="leading-relaxed bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
                   {selectedDoctorModal.bio}
                 </p>
               </div>
 
               <div>
-                <strong className="block text-slate-900 text-xs mb-1">OPD Schedule & Available Time Slots</strong>
+                <strong className="block text-slate-900 dark:text-white text-xs mb-1">OPD Schedule & Available Time Slots</strong>
                 <div className="flex flex-wrap gap-1.5 mt-1">
                   {selectedDoctorModal.availableSlots.map(slot => (
-                    <span key={slot} className="px-2.5 py-1 bg-emerald-50 text-emerald-900 rounded-lg text-xs font-semibold border border-emerald-100">
+                    <span key={slot} className="px-2.5 py-1 bg-emerald-50 dark:bg-slate-800 text-emerald-900 dark:text-emerald-300 rounded-lg text-xs font-semibold border border-emerald-100 dark:border-slate-700">
                       {slot}
                     </span>
                   ))}
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
+              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <div>
                   <span className="text-[11px] text-slate-400 block">Consultation Fee</span>
-                  <span className="text-base font-extrabold text-slate-900">₹{selectedDoctorModal.consultationFee}</span>
+                  <span className="text-base font-extrabold text-slate-900 dark:text-white">₹{selectedDoctorModal.consultationFee}</span>
                 </div>
                 <div>
                   <span className="text-[11px] text-slate-400 block">OPD Room</span>
-                  <span className="font-semibold text-slate-800">{selectedDoctorModal.roomNumber || 'OPD Room 101'}</span>
+                  <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedDoctorModal.roomNumber || 'OPD Room 101'}</span>
                 </div>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
-              <span className="text-xs text-slate-500">CarePulse Certified Faculty</span>
+            <div className="p-4 bg-slate-50 dark:bg-slate-800/80 border-t border-slate-100 dark:border-slate-700 flex justify-between items-center">
+              <span className="text-xs text-slate-500 dark:text-slate-400">CarePulse Certified Faculty</span>
               <button
                 onClick={() => {
                   const id = selectedDoctorModal.id;

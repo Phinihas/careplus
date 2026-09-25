@@ -26,6 +26,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   clearError: () => void;
   updateProfileDetails: (details: Partial<UserProfile>) => Promise<void>;
+  overrideRole: (targetRole: 'patient' | 'admin') => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -199,10 +200,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setProfile(updated);
   };
 
+  const [roleOverride, setRoleOverride] = useState<'patient' | 'admin' | null>(null);
+
   // Strictly verify admin access: user must be authenticated AND have email phinihasgandi@gmail.com
   const userEmailLower = (user?.email || '').trim().toLowerCase();
   const isAdmin = userEmailLower === AUTHORIZED_ADMIN_EMAIL.toLowerCase();
-  const activeRole: UserRole = isAdmin ? 'admin' : 'patient';
+  const activeRole: UserRole = isAdmin ? (roleOverride || 'admin') : 'patient';
+
+  const overrideRole = (targetRole: 'patient' | 'admin') => {
+    if (targetRole === 'admin' && !isAdmin) return;
+    setRoleOverride(targetRole);
+  };
 
   return (
     <AuthContext.Provider value={{
@@ -218,7 +226,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       demoLogin,
       logout,
       clearError: () => setAuthError(null),
-      updateProfileDetails
+      updateProfileDetails,
+      overrideRole
     }}>
       {children}
     </AuthContext.Provider>
